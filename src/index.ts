@@ -1,12 +1,13 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { Firegrace } from './utils/firegrace';
+import { initialiseFirebase } from './utils/firebase';
 
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
-const firegrace = new Firegrace();
+
+initialiseFirebase();
 
 app.use(express.json());
 
