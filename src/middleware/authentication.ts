@@ -36,12 +36,16 @@ export async function setAuthentication(request: Request, response: Response, _:
 /**
  * Clear user authentication state: clear cookies `id` and `token` should each exist and send an unauthorized status in response.
  */
-export async function clearAuthentication(request: Request, response: Response) {
+export async function clearAuthentication(request: Request, response: Response, _: NextFunction) {
     const user: User | undefined = request.user;
 
     if (!user || !user.id) {
         return response.status(StatusCodes.UNAUTHORIZED).send();
     }
+
+    const cookieToken: string = request.cookies.token;
+
+    await FirestoreService.deleteOne(FirestorePath.SESSION, 'token', '==', cookieToken);
 
     response.clearCookie('id');
     response.clearCookie('token');
