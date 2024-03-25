@@ -2,6 +2,7 @@ import {
     DocumentData,
     WhereFilterOp,
     collection,
+    deleteDoc,
     doc,
     getDocs,
     getFirestore,
@@ -39,5 +40,14 @@ export class FirestoreService {
         document.createdAt = Date.now();
 
         await setDoc(documentReference, document);
+    }
+
+    static async deleteOne(path: FirestorePath, key: string, operator: WhereFilterOp, value: any) {
+        const queryStatement = query(collection(getFirestore(), path), where(key, operator, value));
+        const snapshot = await getDocs(queryStatement);
+
+        if (!snapshot.empty) {
+            await deleteDoc(doc(getFirestore(), path, snapshot.docs[0].id));
+        }
     }
 }
