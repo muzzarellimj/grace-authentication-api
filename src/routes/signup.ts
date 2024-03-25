@@ -2,13 +2,16 @@ import bcrypt from 'bcrypt';
 import express, { Request, Response, Router } from 'express';
 import { DEFAULT_SALT_ROUND_COUNT } from '../constants';
 import { FirestorePath, FirestoreService } from '../services/firestore.service';
+import { ValidationService } from '../services/validation.service';
 
 const router: Router = express.Router();
 
 router.post('/signup', async (request: Request, response: Response) => {
     const { email, password, firstName, lastName } = request.body;
 
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
+    const isEmailValid = ValidationService.validateEmailAddress(email);
+
+    if (!isEmailValid) {
         return response.status(400).json({ message: 'Please provide a valid email address.' });
     }
 
@@ -32,7 +35,7 @@ router.post('/signup', async (request: Request, response: Response) => {
         }
 
         await FirestoreService.storeOne(FirestorePath.USER, {
-            email: email,
+            email: email.toLowerCase(),
             password: hash,
             firstName: firstName,
             lastName: lastName,
