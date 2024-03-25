@@ -1,8 +1,15 @@
-import express, { Express } from "express";
-import dotenv from "dotenv";
-import { initializeApp } from "firebase/app";
+require('dotenv').config();
 
-dotenv.config();
+import cookieParser from 'cookie-parser';
+import express, { Express } from 'express';
+import { initializeApp } from 'firebase/app';
+import passport from 'passport';
+import pulseRouter from './routes/pulse';
+import signinRouter from './routes/signin';
+import signoutRouter from './routes/signout';
+import signupRouter from './routes/signup';
+import emailPasswordStrategy from './strategies/email-password';
+import jwtStrategy from './strategies/jwt';
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -17,9 +24,16 @@ initializeApp({
 });
 
 app.use(express.json());
+app.use(cookieParser());
+
+passport.use('email-password', emailPasswordStrategy);
+passport.use('jwt', jwtStrategy);
+
+app.use('/api/authentication', pulseRouter);
+app.use('/api/authentication', signupRouter);
+app.use('/api/authentication', signinRouter);
+app.use('/api/authentication', signoutRouter);
 
 app.listen(port, () => {
-    console.log(
-        `grace-authentication-api is available at http://localhost:${port}/`
-    );
+    console.log(`grace-authentication-api is available at http://localhost:${port}/`);
 });
