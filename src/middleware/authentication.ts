@@ -5,16 +5,12 @@ import { DEFAULT_JWT_TTL } from '../constants';
 import { User } from '../models/user';
 import { FirestorePath, FirestoreService } from '../services/firestore.service';
 
-/**
- * Set user authentication state: generate a JSON web token, set cookies `id` and `token`,
- * and send `id` and `token` in the response body.
- */
-export async function setAuthentication(request: Request, response: Response, _: NextFunction) {
+export async function handleAuthentication(request: Request, response: Response, next: NextFunction) {
     const user: User | undefined = request.user;
 
     if (!user || !user.id) {
         return response
-            .status(StatusCodes.UNAUTHORIZED)
+            .status(StatusCodes.INTERNAL_SERVER_ERROR)
             .json({ message: 'Oops! We hit a snag. Please try again later.' });
     }
 
@@ -22,6 +18,26 @@ export async function setAuthentication(request: Request, response: Response, _:
         expiresIn: DEFAULT_JWT_TTL,
     });
 
+    response = await storeAuthenticationState(user, token, response);
+
+    next();
+}
+
+export async function handleDeauthentication(request: Request, response: Response, next: NextFunction) {
+    const user: User | undefined = request.user;
+
+    if (!user || !user.id) {
+        return response
+            .status(StatusCodes.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Oops! We hit a snag. Please try again later.' });
+    }
+
+    response = await clearAuthenticationState(request.cookies.token, response);
+
+    next();
+}
+
+export async function storeAuthenticationState(user: User, token: string, response: Response): Promise<Response> {
     await FirestoreService.storeOne(FirestorePath.SESSION, {
         user: user.id,
         token: token,
@@ -30,25 +46,14 @@ export async function setAuthentication(request: Request, response: Response, _:
     response.cookie('id', user.id);
     response.cookie('token', token);
 
-    response.status(StatusCodes.CREATED).json({ id: user.id, token });
+    return response;
 }
 
-/**
- * Clear user authentication state: clear cookies `id` and `token` should each exist and send an unauthorized status in response.
- */
-export async function clearAuthentication(request: Request, response: Response, _: NextFunction) {
-    const user: User | undefined = request.user;
-
-    if (!user || !user.id) {
-        return response.status(StatusCodes.UNAUTHORIZED).send();
-    }
-
-    const cookieToken: string = request.cookies.token;
-
-    await FirestoreService.deleteOne(FirestorePath.SESSION, 'token', '==', cookieToken);
+export async function clearAuthenticationState(token: string, response: Response): Promise<Response> {
+    await FirestoreService.deleteOne(FirestorePath.SESSION, 'token', '==', token);
 
     response.clearCookie('id');
     response.clearCookie('token');
 
-    response.status(StatusCodes.UNAUTHORIZED).send();
+    return response;
 }
