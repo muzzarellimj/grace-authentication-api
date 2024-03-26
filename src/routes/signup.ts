@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import express, { Request, Response, Router } from 'express';
+import { StatusCodes } from 'http-status-codes';
 import { DEFAULT_SALT_ROUND_COUNT } from '../constants';
 import { validateUserCreationArgs } from '../middleware/validation';
 import { FirestorePath, FirestoreService } from '../services/firestore.service';
@@ -12,12 +13,16 @@ router.post('/signup', validateUserCreationArgs, async (request: Request, respon
     const existingUser = await FirestoreService.findOne(FirestorePath.USER, 'email', '==', email.toLowerCase());
 
     if (existingUser) {
-        return response.status(400).json({ message: 'An account with this email address already exists.' });
+        return response
+            .status(StatusCodes.BAD_REQUEST)
+            .json({ message: 'A user account already exists with this email address.' });
     }
 
     bcrypt.hash(password, DEFAULT_SALT_ROUND_COUNT, async (error: Error | undefined, hash: string) => {
         if (error) {
-            return response.status(500).json({ message: 'We hit a snag - please try again later.' });
+            return response
+                .status(StatusCodes.INTERNAL_SERVER_ERROR)
+                .json({ message: 'Oops! We hit a snag. Please try again later.' });
         }
 
         await FirestoreService.storeOne(FirestorePath.USER, {
@@ -26,9 +31,9 @@ router.post('/signup', validateUserCreationArgs, async (request: Request, respon
             firstName: firstName,
             lastName: lastName,
         });
-
-        return response.status(201).json({ message: 'Success! Your profile has been created. Welcome to Grace!' });
     });
+
+    response.status(StatusCodes.CREATED).json({ message: 'Your user account has been created. Welcome to Grace!' });
 });
 
 export default router;
