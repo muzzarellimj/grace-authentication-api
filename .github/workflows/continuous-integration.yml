@@ -1,0 +1,31 @@
+name: Continuous Integration with GitHub Actions
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 'lts/*'
+            - run: npm ci
+            - run: npm audit signatures
+            - run: npx semantic-release
+              env:
+                  GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+                  FIREBASE_API_KEY: ${{secrets.FIREBASE_API_KEY}}
+                  FIREBASE_APP_ID: ${{secrets.FIREBASE_APP_ID}}
+                  FIREBASE_AUTH_DOMAIN: ${{secrets.FIREBASE_AUTH_DOMAIN}}
+                  FIREBASE_MESSAGING_SENDER_ID: ${{secrets.FIREBASE_MESSAGING_SENDER_ID}}
+                  FIREBASE_PROJECT_ID: ${{secrets.FIREBASE_PROJECT_ID}}
+                  FIREBASE_STORAGE_BUCKET: ${{secrets.FIREBASE_STORAGE_BUCKET}}
+                  JWT_SECRET: ${{secrets.JWT_SECRET}}
+                  OAUTH_CLIENT_ID: ${{secrets.OAUTH_CLIENT_ID}}
+                  OAUTH_CLIENT_SECRET: ${{secrets.OAUTH_CLIENT_SECRET}}
