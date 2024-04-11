@@ -11,6 +11,9 @@
   "author": "Michael Muzzarelli",
   "license": "ISC",
   "private": true,
+  "release": {
+    "branches": ["main"]
+  },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.7",
