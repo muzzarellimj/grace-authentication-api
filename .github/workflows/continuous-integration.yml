@@ -16,7 +16,7 @@ jobs:
               with:
                 node-version: 'lts/*'
             - run: npm install
-            - run: npx lint-staged --diff=origin/main
+            - run: npm run lint:check
 
     release:
         runs-on: ubuntu-latest
