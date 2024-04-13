@@ -18,4 +18,22 @@ router.post(
     }
 );
 
+router.get(
+    '/signin/google',
+    disallowExistingAuthentication,
+    passport.authenticate('google-oauth', { session: false })
+);
+
+router.get(
+    '/signin/google/reroute',
+    disallowExistingAuthentication,
+    passport.authenticate('google-oauth', {
+        session: false,
+    }),
+    handleAuthentication,
+    (_: Request, response: Response) => {
+        response.status(StatusCodes.OK).send();
+    }
+);
+
 export default router;

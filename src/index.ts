@@ -1,4 +1,4 @@
-require('dotenv').config(); // eslint-disable-line @typescript-eslint/no-var-requires
+import 'dotenv/config';
 
 import cookieParser from 'cookie-parser';
 import express, { Express } from 'express';
@@ -9,6 +9,7 @@ import signinRouter from './routes/signin';
 import signoutRouter from './routes/signout';
 import signupRouter from './routes/signup';
 import emailPasswordStrategy from './strategies/email-password';
+import googleOAuthStrategy from './strategies/google-oauth';
 import jwtStrategy from './strategies/jwt';
 
 const app: Express = express();
@@ -28,11 +29,12 @@ app.use(cookieParser());
 
 passport.use('email-password', emailPasswordStrategy);
 passport.use('jwt', jwtStrategy);
+passport.use('google-oauth', googleOAuthStrategy);
 
-app.use('/api/authentication', pulseRouter);
-app.use('/api/authentication', signupRouter);
-app.use('/api/authentication', signinRouter);
-app.use('/api/authentication', signoutRouter);
+app.use('/api', pulseRouter);
+app.use('/api', signupRouter);
+app.use('/api', signinRouter);
+app.use('/api', signoutRouter);
 
 app.listen(port, () => {
     console.log(
