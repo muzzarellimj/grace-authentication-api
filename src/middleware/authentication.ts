@@ -18,11 +18,9 @@ export async function disallowExistingAuthentication(
         response = await clearAuthenticationState(cookies.token, response);
 
         if (!tokenExpired) {
-            return response
-                .status(StatusCodes.FORBIDDEN)
-                .json({
-                    message: 'Oops! We hit a snag. Please try again later.',
-                });
+            return response.status(StatusCodes.FORBIDDEN).json({
+                message: 'Oops! We hit a snag. Please try again later.',
+            });
         }
     }
 
