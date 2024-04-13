@@ -16,7 +16,7 @@ jobs:
               with:
                 node-version: 'lts/*'
             - run: npm install
-            - run: npx lint-staged --diff="origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF}"
+            - run: npx lint-staged --diff=origin/main
 
     release:
         runs-on: ubuntu-latest
