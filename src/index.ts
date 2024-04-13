@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config(); // eslint-disable-line @typescript-eslint/no-var-requires
 
 import cookieParser from 'cookie-parser';
 import express, { Express } from 'express';
@@ -35,5 +35,7 @@ app.use('/api/authentication', signinRouter);
 app.use('/api/authentication', signoutRouter);
 
 app.listen(port, () => {
-    console.log(`grace-authentication-api is available at http://localhost:${port}/`);
+    console.log(
+        `grace-authentication-api is available at http://localhost:${port}/`
+    );
 });

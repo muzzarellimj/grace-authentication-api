@@ -4,8 +4,12 @@ import passport from 'passport';
 
 const router: Router = express.Router();
 
-router.post('/pulse', passport.authenticate('jwt', { session: false }), (_: Request, response: Response) => {
-    response.status(StatusCodes.OK).send();
-});
+router.post(
+    '/pulse',
+    passport.authenticate('jwt', { session: false }),
+    (_: Request, response: Response) => {
+        response.status(StatusCodes.OK).send();
+    }
+);
 
 export default router;

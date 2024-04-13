@@ -15,15 +15,23 @@ type JwtPayload = {
     exp: number;
 };
 
-const jwtStrategy = new JwtStrategy(options, async (payload: JwtPayload, done: VerifiedCallback) => {
-    const matchingUser = await FirestoreService.findOne(FirestorePath.USER, 'id', '==', payload.id);
+const jwtStrategy = new JwtStrategy(
+    options,
+    async (payload: JwtPayload, done: VerifiedCallback) => {
+        const matchingUser = await FirestoreService.findOne(
+            FirestorePath.USER,
+            'id',
+            '==',
+            payload.id
+        );
 
-    if (!matchingUser) {
-        return done(null, false);
+        if (!matchingUser) {
+            return done(null, false);
+        }
+
+        return done(null, matchingUser);
     }
-
-    return done(null, matchingUser);
-});
+);
 
 function cookieExtractor(request: Request) {
     return request?.cookies?.token;

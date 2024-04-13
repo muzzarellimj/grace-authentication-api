@@ -7,14 +7,23 @@ const LocalStrategy = passport.Strategy;
 
 const emailPasswordStrategy = new LocalStrategy(
     { usernameField: 'email' },
-    async (email: string, password: string, done: (error: any, user?: false | Express.User | undefined) => void) => {
+    async (
+        email: string,
+        password: string,
+        done: (error: any, user?: false | Express.User | undefined) => void
+    ) => {
         const isEmailValid = ValidationService.validateEmailAddress(email);
 
         if (!isEmailValid) {
             return done(null, false);
         }
 
-        const matchingUser = await FirestoreService.findOne(FirestorePath.USER, 'email', '==', email.toLowerCase());
+        const matchingUser = await FirestoreService.findOne(
+            FirestorePath.USER,
+            'email',
+            '==',
+            email.toLowerCase()
+        );
 
         if (!matchingUser) {
             return done(null, false);

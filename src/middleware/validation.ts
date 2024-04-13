@@ -6,7 +6,9 @@ const MIN_PASSWORD_LENGTH: number = 8;
 
 const userCreationArgsSchema: ZodSchema = z.object({
     email: z.string().email({ message: 'Please enter a valid email address.' }),
-    password: z.string().min(MIN_PASSWORD_LENGTH, { message: 'Please enter a password with 8 or more characters.' }),
+    password: z.string().min(MIN_PASSWORD_LENGTH, {
+        message: 'Please enter a password with 8 or more characters.',
+    }),
     firstName: z.string({
         required_error: 'Please provide an appropriate first name.',
     }),
@@ -15,7 +17,11 @@ const userCreationArgsSchema: ZodSchema = z.object({
     }),
 });
 
-export function validateUserCreationArgs(request: Request, response: Response, next: NextFunction) {
+export function validateUserCreationArgs(
+    request: Request,
+    response: Response,
+    next: NextFunction
+) {
     const validationState = userCreationArgsSchema.safeParse({
         email: request.body.email,
         password: request.body.password,
@@ -24,10 +30,13 @@ export function validateUserCreationArgs(request: Request, response: Response, n
     });
 
     if (!validationState.success) {
-        let message: string =
-            validationState.error.issues[0]?.message ?? 'Oops! We hit a snag. Please try again later.';
+        const message: string =
+            validationState.error.issues[0]?.message ??
+            'Oops! We hit a snag. Please try again later.';
 
-        return response.status(StatusCodes.BAD_REQUEST).json({ status: StatusCodes.BAD_REQUEST, message: message });
+        return response
+            .status(StatusCodes.BAD_REQUEST)
+            .json({ status: StatusCodes.BAD_REQUEST, message: message });
     }
 
     next();

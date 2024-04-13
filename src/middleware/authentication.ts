@@ -5,7 +5,11 @@ import { DEFAULT_JWT_TTL } from '../constants';
 import { User } from '../models/user';
 import { FirestorePath, FirestoreService } from '../services/firestore.service';
 
-export async function disallowExistingAuthentication(request: Request, response: Response, next: NextFunction) {
+export async function disallowExistingAuthentication(
+    request: Request,
+    response: Response,
+    next: NextFunction
+) {
     const cookies: Record<string, any> = request.cookies;
 
     if (cookies.token) {
@@ -16,14 +20,20 @@ export async function disallowExistingAuthentication(request: Request, response:
         if (!tokenExpired) {
             return response
                 .status(StatusCodes.FORBIDDEN)
-                .json({ message: 'Oops! We hit a snag. Please try again later.' });
+                .json({
+                    message: 'Oops! We hit a snag. Please try again later.',
+                });
         }
     }
 
     next();
 }
 
-export async function handleAuthentication(request: Request, response: Response, next: NextFunction) {
+export async function handleAuthentication(
+    request: Request,
+    response: Response,
+    next: NextFunction
+) {
     const user: User | undefined = request.user;
     const cookies: Record<string, any> = request.cookies;
 
@@ -37,16 +47,24 @@ export async function handleAuthentication(request: Request, response: Response,
         response = await clearAuthenticationState(cookies.token, response);
     }
 
-    const token: string = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
-        expiresIn: DEFAULT_JWT_TTL,
-    });
+    const token: string = jwt.sign(
+        { id: user.id },
+        process.env.JWT_SECRET as string,
+        {
+            expiresIn: DEFAULT_JWT_TTL,
+        }
+    );
 
     response = await storeAuthenticationState(user, token, response);
 
     next();
 }
 
-export async function handleDeauthentication(request: Request, response: Response, next: NextFunction) {
+export async function handleDeauthentication(
+    request: Request,
+    response: Response,
+    next: NextFunction
+) {
     const user: User | undefined = request.user;
 
     if (!user || !user.id) {
@@ -60,7 +78,11 @@ export async function handleDeauthentication(request: Request, response: Respons
     next();
 }
 
-export async function storeAuthenticationState(user: User, token: string, response: Response): Promise<Response> {
+export async function storeAuthenticationState(
+    user: User,
+    token: string,
+    response: Response
+): Promise<Response> {
     await FirestoreService.storeOne(FirestorePath.SESSION, {
         user: user.id,
         token: token,
@@ -72,8 +94,16 @@ export async function storeAuthenticationState(user: User, token: string, respon
     return response;
 }
 
-export async function clearAuthenticationState(token: string, response: Response): Promise<Response> {
-    await FirestoreService.deleteOne(FirestorePath.SESSION, 'token', '==', token);
+export async function clearAuthenticationState(
+    token: string,
+    response: Response
+): Promise<Response> {
+    await FirestoreService.deleteOne(
+        FirestorePath.SESSION,
+        'token',
+        '==',
+        token
+    );
 
     response.clearCookie('id');
     response.clearCookie('token');

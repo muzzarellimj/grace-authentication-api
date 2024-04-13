@@ -23,7 +23,10 @@ export class FirestoreService {
         operator: WhereFilterOp,
         value: any
     ): Promise<DocumentData | null> {
-        const queryStatement = query(collection(getFirestore(), path), where(key, operator, value));
+        const queryStatement = query(
+            collection(getFirestore(), path),
+            where(key, operator, value)
+        );
         const snapshot = await getDocs(queryStatement);
 
         if (snapshot.empty) {
@@ -42,8 +45,16 @@ export class FirestoreService {
         await setDoc(documentReference, document);
     }
 
-    static async deleteOne(path: FirestorePath, key: string, operator: WhereFilterOp, value: any) {
-        const queryStatement = query(collection(getFirestore(), path), where(key, operator, value));
+    static async deleteOne(
+        path: FirestorePath,
+        key: string,
+        operator: WhereFilterOp,
+        value: any
+    ) {
+        const queryStatement = query(
+            collection(getFirestore(), path),
+            where(key, operator, value)
+        );
         const snapshot = await getDocs(queryStatement);
 
         if (!snapshot.empty) {
