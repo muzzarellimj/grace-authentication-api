@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "build": "npx tsc",
-        "lint": "npx prettier '**/*.ts' --write && npx eslint .",
+        "lint:check": "npx prettier '**/*.ts' --check && npx eslint .",
+        "lint:fix": "npx prettier '**/*.ts' --fix && npx eslint . --fix",
         "prepare": "husky",
         "start": "node dist/index.js",
         "start:dev": "nodemon src/index.ts"
@@ -14,6 +15,12 @@
     "license": "ISC",
     "type": "module",
     "private": true,
+    "lint-staged": {
+        "**/*.ts": [
+            "prettier --write",
+            "eslint"
+        ]
+    },
     "release": {
         "branches": [
             "main"
@@ -34,6 +41,7 @@
         "eslint": "^8.57.0",
         "eslint-config-prettier": "^9.1.0",
         "husky": "^9.0.11",
+        "lint-staged": "^15.2.2",
         "nodemon": "^3.0.3",
         "prettier": "^3.2.5",
         "ts-node": "^10.9.2",
