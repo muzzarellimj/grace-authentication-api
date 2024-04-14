@@ -7,3 +7,10 @@ export type User = {
     lastName?: string;
     createdAt?: number;
 };
+
+export type Profile = {
+    id: string;
+    email?: string;
+    firstName: string;
+    lastName: string;
+};

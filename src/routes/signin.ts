@@ -5,6 +5,7 @@ import {
     disallowExistingAuthentication,
     handleAuthentication,
 } from '../middleware/authentication';
+import { ProfileService } from '../services/profile.service';
 
 const router: Router = express.Router();
 
@@ -13,8 +14,11 @@ router.post(
     disallowExistingAuthentication,
     passport.authenticate('email-password', { session: false }),
     handleAuthentication,
-    (_: Request, response: Response) => {
-        response.status(StatusCodes.OK).send();
+    (request: Request, response: Response) => {
+        response.status(StatusCodes.OK).json({
+            status: StatusCodes.OK,
+            profile: ProfileService.extract(request),
+        });
     }
 );
 
@@ -31,8 +35,11 @@ router.get(
         session: false,
     }),
     handleAuthentication,
-    (_: Request, response: Response) => {
-        response.status(StatusCodes.OK).send();
+    (request: Request, response: Response) => {
+        response.status(StatusCodes.OK).json({
+            status: StatusCodes.OK,
+            profile: ProfileService.extract(request),
+        });
     }
 );
 
