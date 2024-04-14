@@ -1,7 +1,8 @@
 import pino, { Logger } from 'pino';
 
 type LoggingProperties = {
-    source: string;
+    cls?: string;
+    fn?: string;
     message: string;
     data?: any;
 };
@@ -11,6 +12,10 @@ export class LoggingService {
 
     static init() {
         this.instance = pino();
+    }
+
+    static debug(properties: LoggingProperties) {
+        this.instance.debug(properties);
     }
 
     static error(properties: LoggingProperties) {

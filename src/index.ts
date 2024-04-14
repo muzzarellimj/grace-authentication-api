@@ -41,7 +41,8 @@ app.use('/api', signoutRouter);
 
 app.listen(port, () => {
     LoggingService.info({
-        source: 'express.App#listen',
-        message: `Grace Authentication API is available at: http://localhost:${port}/`,
+        cls: 'index',
+        fn: 'express.App#listen',
+        message: `Grace Authentication API is available on port: ${port}`,
     });
 });
