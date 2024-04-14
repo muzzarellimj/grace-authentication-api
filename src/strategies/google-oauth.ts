@@ -4,6 +4,9 @@ import passport, {
     VerifyCallback,
 } from 'passport-google-oauth20';
 import { FirestorePath, FirestoreService } from '../services/firestore.service';
+import { LoggingService } from '../services/logging.service';
+
+const cls: string = 'google-oauth';
 
 const GoogleOAuthStrategy = passport.Strategy;
 
@@ -22,16 +25,26 @@ const googleOAuthStrategy = new GoogleOAuthStrategy(
         profile: Profile,
         done: VerifyCallback
     ) => {
-        const existingUser = await FirestoreService.findOne(
+        const fn: string = 'googleOAuthStrategy';
+
+        LoggingService.debug({
+            cls: cls,
+            fn: fn,
+            message: 'Authenticating with Passport Google OAuth strategy...',
+            data: {
+                externalId: profile.id,
+                email: profile.emails?.[0].value,
+            },
+        });
+
+        const user = await FirestoreService.findOne(
             FirestorePath.USER,
             'externalId',
             '==',
             profile.id
         );
 
-        if (!existingUser) {
-            console.log(profile);
-
+        if (!user) {
             await FirestoreService.storeOne(FirestorePath.USER, {
                 externalId: profile.id,
                 email: profile.emails?.[0].value,
@@ -47,13 +60,45 @@ const googleOAuthStrategy = new GoogleOAuthStrategy(
             );
 
             if (!newUser) {
+                LoggingService.error({
+                    cls: cls,
+                    fn: fn,
+                    message:
+                        'Authentication with Passport Google OAuth failure; external identifier did not exist and new user could not be created.',
+                    data: {
+                        externalId: profile.id,
+                        email: profile.emails?.[0].value,
+                    },
+                });
+
                 return done(null, false);
             }
+
+            LoggingService.info({
+                cls: cls,
+                fn: fn,
+                message:
+                    'Google OAuth sign-up success; user profile created and stored.',
+                data: {
+                    externalId: newUser.externalId,
+                    email: newUser.email,
+                },
+            });
 
             return done(null, newUser);
         }
 
-        return done(null, existingUser);
+        LoggingService.debug({
+            cls: cls,
+            fn: fn,
+            message: 'Authentication with Passport Google OAuth success.',
+            data: {
+                externalId: user.externalId,
+                email: user.email,
+            },
+        });
+
+        return done(null, user);
     }
 );
 
