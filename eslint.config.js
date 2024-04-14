@@ -11,6 +11,9 @@ export default tslint.config(
   {
     rules: {
         '@typescript-eslint/no-explicit-any': 'off',
-    }
+    },
+    ignores: [
+      '/dist/**'
+    ]
   }
 );

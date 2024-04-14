@@ -2,11 +2,10 @@
     "name": "grace-authentication-api",
     "version": "0.0.1",
     "description": "A Node-based REST API serving authentication to the Grace collection management platform",
-    "main": "index.js",
     "scripts": {
-        "build": "npx tsc",
-        "lint:check": "npx prettier '**/*.ts' --check && npx eslint .",
-        "lint:fix": "npx prettier '**/*.ts' --fix && npx eslint . --fix",
+        "build": "npx tsc-esm",
+        "lint:check": "npx prettier \"**/*.ts\" --check && npx eslint",
+        "lint:fix": "npx prettier \"**/*.ts\" --write && npx eslint --fix",
         "prepare": "husky",
         "start": "node dist/index.js",
         "start:dev": "tsx --watch src/index.ts | pino-pretty"
@@ -27,6 +26,7 @@
         ]
     },
     "devDependencies": {
+        "@digitak/tsc-esm": "^3.1.4",
         "@eslint/js": "^9.0.0",
         "@types/bcrypt": "^5.0.2",
         "@types/cookie-parser": "^1.4.7",
