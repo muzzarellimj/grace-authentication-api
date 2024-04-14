@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import express, { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { DEFAULT_SALT_ROUND_COUNT } from '../constants';
-import { disallowExistingAuthentication } from '../middleware/authentication';
+import { preventAuthentication } from '../middleware/authentication';
 import { validateUserCreationArgs } from '../middleware/validation';
 import { FirestorePath, FirestoreService } from '../services/firestore.service';
 
@@ -10,7 +10,7 @@ const router: Router = express.Router();
 
 router.post(
     '/signup',
-    disallowExistingAuthentication,
+    preventAuthentication,
     validateUserCreationArgs,
     async (request: Request, response: Response) => {
         const { email, password, firstName, lastName } = request.body;

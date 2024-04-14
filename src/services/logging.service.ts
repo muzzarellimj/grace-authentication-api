@@ -11,7 +11,9 @@ export class LoggingService {
     static instance: Logger;
 
     static init() {
-        this.instance = pino();
+        this.instance = pino({
+            level: process.env.LOGGING_LEVEL ?? 'warn',
+        });
     }
 
     static debug(properties: LoggingProperties) {
