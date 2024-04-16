@@ -88,7 +88,7 @@ router.post(
             }
         );
 
-        LoggingService.error({
+        LoggingService.info({
             cls: cls,
             fn: fn,
             message:
