@@ -1,7 +1,7 @@
 import express, { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import passport from 'passport';
-import { handleDeauthentication } from '../middleware/authentication';
+import { handleDeauthentication } from '../middleware/authentication.middleware';
 import { LoggingService } from '../services/logging.service';
 
 const router: Router = express.Router();

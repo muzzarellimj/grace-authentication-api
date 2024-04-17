@@ -4,7 +4,7 @@ import passport from 'passport';
 import {
     handleAuthentication,
     preventAuthentication,
-} from '../middleware/authentication';
+} from '../middleware/authentication.middleware';
 import { Profile } from '../models/user';
 import { LoggingService } from '../services/logging.service';
 import { ProfileService } from '../services/profile.service';

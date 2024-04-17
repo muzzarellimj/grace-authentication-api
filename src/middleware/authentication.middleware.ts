@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { DEFAULT_JWT_TTL } from '../constants';
 import { User } from '../models/user';
-import { FirestorePath, FirestoreService } from '../services/firestore.service';
+import AuthenticationStateService from '../services/authentication-state.service';
 import { LoggingService } from '../services/logging.service';
 
 const cls: string = 'authentication';
@@ -26,7 +26,10 @@ export async function preventAuthentication(
     if (cookies.token) {
         const tokenExpired: boolean = isTokenExpired(cookies.token);
 
-        response = await clearAuthenticationState(cookies.token, response);
+        response = await AuthenticationStateService.clearAuthenticationState(
+            cookies.token,
+            response
+        );
 
         if (!tokenExpired) {
             LoggingService.warn({
@@ -97,7 +100,10 @@ export async function handleAuthentication(
     }
 
     if (cookies.token) {
-        response = await clearAuthenticationState(cookies.token, response);
+        response = await AuthenticationStateService.clearAuthenticationState(
+            cookies.token,
+            response
+        );
     }
 
     const token: string = jwt.sign(
@@ -108,7 +114,11 @@ export async function handleAuthentication(
         }
     );
 
-    response = await storeAuthenticationState(user, token, response);
+    response = await AuthenticationStateService.storeAuthenticationState(
+        user,
+        token,
+        response
+    );
 
     LoggingService.debug({
         cls: cls,
@@ -159,7 +169,10 @@ export async function handleDeauthentication(
             .json({ message: 'Oops! We hit a snag. Please try again later.' });
     }
 
-    response = await clearAuthenticationState(request.cookies.token, response);
+    response = await AuthenticationStateService.clearAuthenticationState(
+        request.cookies.token,
+        response
+    );
 
     LoggingService.debug({
         cls: cls,
@@ -169,74 +182,6 @@ export async function handleDeauthentication(
     });
 
     next();
-}
-
-export async function storeAuthenticationState(
-    user: User,
-    token: string,
-    response: Response
-): Promise<Response> {
-    const fn: string = 'storeAuthenticationState';
-
-    LoggingService.debug({
-        cls: cls,
-        fn: fn,
-        message: 'Authentication success; storing authentication state...',
-    });
-
-    await FirestoreService.storeOne(FirestorePath.SESSION, {
-        user: user.id,
-        token: token,
-    });
-
-    response.cookie('id', user.id);
-    response.cookie('token', token);
-
-    LoggingService.info({
-        cls: cls,
-        fn: fn,
-        message: 'Authentication state has been stored with success.',
-        data: {
-            id: user.id,
-            token: token,
-        },
-    });
-
-    return response;
-}
-
-export async function clearAuthenticationState(
-    token: string,
-    response: Response
-): Promise<Response> {
-    const fn: string = 'clearAuthenticationState';
-
-    LoggingService.debug({
-        cls: cls,
-        fn: fn,
-        message: 'Clearing authentication state...',
-    });
-
-    await FirestoreService.deleteOne(
-        FirestorePath.SESSION,
-        'token',
-        '==',
-        token
-    );
-
-    response.clearCookie('id');
-    response.clearCookie('token');
-
-    LoggingService.info({
-        cls: cls,
-        fn: fn,
-        message: 'Authentication state has been cleared with success.',
-        data: {
-            token: token,
-        },
-    });
-
-    return response;
 }
 
 function isTokenExpired(token: string): boolean {
