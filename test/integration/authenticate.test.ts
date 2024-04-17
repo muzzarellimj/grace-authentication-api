@@ -33,8 +33,6 @@ describe('authenticate', () => {
             expect(response.body.message).toBe(
                 'Your user profile has been created. Welcome to Grace!'
             );
-
-            console.log(response.headers['set-cookie']);
         });
 
         it('should not create user when email is invalid', async () => {
