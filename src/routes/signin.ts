@@ -5,7 +5,7 @@ import {
     handleAuthentication,
     preventAuthentication,
 } from '../middleware/authentication.middleware';
-import { Profile } from '../models/user';
+import { Profile, User } from '../models/user';
 import { LoggingService } from '../services/logging.service';
 import { ProfileService } from '../services/profile.service';
 
@@ -37,8 +37,7 @@ router.post(
                 message:
                     'Sign-in with email and password success but profile could not be extracted.',
                 data: {
-                    id: request.cookies.id,
-                    token: request.cookies.token,
+                    token: response.locals.token,
                 },
             });
 
@@ -54,14 +53,15 @@ router.post(
             message:
                 'Sign-in with email and passsword and profile extraction success.',
             data: {
-                id: request.cookies.id,
-                token: request.cookies.token,
+                id: (request.user as User).id,
+                token: response.locals.token,
             },
         });
 
         response.status(StatusCodes.OK).json({
             status: StatusCodes.OK,
             profile: profile,
+            token: response.locals.token,
         });
     }
 );
@@ -97,8 +97,7 @@ router.get(
                 message:
                     'Sign-in with Google success but profile could not be extracted.',
                 data: {
-                    id: request.cookies.id,
-                    token: request.cookies.token,
+                    token: response.locals.token,
                 },
             });
 
@@ -113,14 +112,15 @@ router.get(
             fn: fn,
             message: 'Sign-in with Google and profile extraction success.',
             data: {
-                id: request.cookies.id,
-                token: request.cookies.token,
+                id: (request.user as User).id,
+                token: response.locals.token,
             },
         });
 
         response.status(StatusCodes.OK).json({
             status: StatusCodes.OK,
             profile: profile,
+            token: response.locals.token,
         });
     }
 );
