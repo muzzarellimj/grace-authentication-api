@@ -1,6 +1,7 @@
 import 'dotenv/config';
 
-import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
+import cors from 'cors';
 import express, { Express } from 'express';
 import { initializeApp } from 'firebase/app';
 import passport from 'passport';
@@ -17,8 +18,9 @@ LoggingService.init();
 
 const app: Express = express();
 
-app.use(express.json());
-app.use(cookieParser());
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 passport.use('email-password', emailPasswordStrategy);
 passport.use('jwt', jwtStrategy);
