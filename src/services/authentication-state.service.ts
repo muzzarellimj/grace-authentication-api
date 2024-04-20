@@ -24,9 +24,6 @@ export default class AuthenticationStateService {
             token: token,
         });
 
-        response.cookie('id', user.id);
-        response.cookie('token', token);
-
         LoggingService.info({
             cls: AuthenticationStateService.cls,
             fn: fn,
@@ -58,9 +55,6 @@ export default class AuthenticationStateService {
             '==',
             token
         );
-
-        response.clearCookie('id');
-        response.clearCookie('token');
 
         LoggingService.info({
             cls: AuthenticationStateService.cls,
