@@ -1,9 +1,10 @@
 import express, { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import passport from 'passport';
-import { Profile } from '../models/user';
+import { Profile, User } from '../models/user';
 import { LoggingService } from '../services/logging.service';
 import { ProfileService } from '../services/profile.service';
+import { extractToken } from '../utils/jwt.util';
 
 const cls: string = 'pulse';
 
@@ -22,6 +23,7 @@ router.post(
         });
 
         const profile: Profile | undefined = ProfileService.extract(request);
+        const token: string = extractToken(request);
 
         if (!profile) {
             LoggingService.error({
@@ -30,8 +32,7 @@ router.post(
                 message:
                     'Authentication pulse success but profile could not be extracted.',
                 data: {
-                    id: request.cookies.id,
-                    token: request.cookies.token,
+                    token: token,
                 },
             });
 
@@ -46,14 +47,15 @@ router.post(
             fn: fn,
             message: 'Authentication pulse and profile extraction success.',
             data: {
-                id: request.cookies.id,
-                token: request.cookies.token,
+                id: (request.user as User).id,
+                token: token,
             },
         });
 
         response.status(StatusCodes.OK).json({
             status: StatusCodes.OK,
             profile: profile,
+            token: token,
         });
     }
 );

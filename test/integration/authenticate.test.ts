@@ -177,9 +177,7 @@ describe('authenticate', () => {
         });
 
         it('should pulse OK with existing authentication', async () => {
-            const agent = request.agent(application);
-
-            let response = await agent
+            let response = await request(application)
                 .post('/api/signin')
                 .set('content-type', 'application/json')
                 .send({
@@ -192,25 +190,26 @@ describe('authenticate', () => {
                 'testuser@muzzarelli.dev'
             );
 
-            // token = extractCookie(agent, 'token');
+            token = response.body.token;
+            expect(token).not.toBe('');
 
-            response = await agent
+            response = await request(application)
                 .post('/api/pulse')
                 .set('content-type', 'application/json')
-                .set('Cookie', `token=${token}`)
+                .set('authorization', `Bearer ${token}`)
                 .send();
 
             expect(response.status).toBe(StatusCodes.OK);
             expect(response.body.profile?.email).toBe(
                 'testuser@muzzarelli.dev'
             );
+            expect(response.body.token).toBe(token);
 
             deleteTestSession(token);
         });
 
         it('should pulse UNAUTHORIZED without existing authentication', async () => {
-            const agent = request.agent(application);
-            const response = await agent
+            const response = await request(application)
                 .post('/api/pulse')
                 .set('content-type', 'application/json')
                 .send();
