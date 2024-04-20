@@ -241,12 +241,13 @@ describe('authenticate', () => {
                 'testuser@muzzarelli.dev'
             );
 
-            // token = extractCookie(agent, 'token');
+            token = response.body.token;
+            expect(token).not.toBe('');
 
             response = await agent
                 .post('/api/signout')
                 .set('content-type', 'application/json')
-                .set('Cookie', `token=${token}`)
+                .set('authorization', `Bearer ${token}`)
                 .send();
 
             expect(response.status).toBe(StatusCodes.OK);
