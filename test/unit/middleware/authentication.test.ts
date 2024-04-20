@@ -63,9 +63,8 @@ describe('authentication', () => {
             const token: string = sign({ id: id }, secret, { expiresIn: -1 });
 
             const request = createRequest({
-                cookies: {
-                    id: id,
-                    token: token,
+                headers: {
+                    authorization: `Bearer ${token}`,
                 },
             });
             const response = createResponse();
@@ -81,9 +80,8 @@ describe('authentication', () => {
             const token: string = sign({ id: id }, secret, { expiresIn: '1h' });
 
             const request = createRequest({
-                cookies: {
-                    id: id,
-                    token: token,
+                headers: {
+                    authorization: `Bearer ${token}`,
                 },
             });
             const response = createResponse();
@@ -124,9 +122,8 @@ describe('authentication', () => {
             const token = sign({ id: id }, secret, { expiresIn: -1 });
 
             const request = createRequest({
-                cookies: {
-                    id: id,
-                    token: token,
+                headers: {
+                    authorization: `Bearer ${token}`,
                 },
                 user: {
                     id: id,

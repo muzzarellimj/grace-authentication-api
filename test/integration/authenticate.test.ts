@@ -1,7 +1,5 @@
-import { CookieAccessInfo } from 'cookiejar';
 import { StatusCodes } from 'http-status-codes';
 import request from 'supertest';
-import TestAgent from 'supertest/lib/agent';
 import application from '../../src/application';
 import {
     FirestorePath,
@@ -95,8 +93,7 @@ describe('authenticate', () => {
         });
 
         it('should sign in with correct email and password', async () => {
-            const agent = request.agent(application);
-            const response = await agent
+            const response = await request(application)
                 .post('/api/signin')
                 .set('content-type', 'application/json')
                 .send({
@@ -109,15 +106,14 @@ describe('authenticate', () => {
                 'testuser@muzzarelli.dev'
             );
 
-            token = extractCookie(agent, 'token');
+            token = response.body.token;
+            expect(token).not.toBeNull();
 
             deleteTestSession(token);
         });
 
         it('should not sign in with correct email and password but existing authentication', async () => {
-            const agent = request.agent(application);
-
-            let response = await agent
+            let response = await request(application)
                 .post('/api/signin')
                 .set('content-type', 'application/json')
                 .send({
@@ -130,12 +126,13 @@ describe('authenticate', () => {
                 'testuser@muzzarelli.dev'
             );
 
-            token = extractCookie(agent, 'token');
+            token = response.body.token;
+            expect(token).not.toBeNull();
 
-            response = await agent
+            response = await request(application)
                 .post('/api/signin')
                 .set('content-type', 'application/json')
-                .set('Cookie', `token=${token}`)
+                .set('Authorization', `Bearer ${token}`)
                 .send({
                     email: 'testuser@muzzarelli.dev',
                     password: 'simple!test?password',
@@ -148,8 +145,7 @@ describe('authenticate', () => {
         });
 
         it('should not sign in with incorrect email', async () => {
-            const agent = request.agent(application);
-            const response = await agent
+            const response = await request(application)
                 .post('/api/signin')
                 .set('content-type', 'application/json')
                 .send({
@@ -161,8 +157,7 @@ describe('authenticate', () => {
         });
 
         it('should not sign in with incorrect password', async () => {
-            const agent = request.agent(application);
-            const response = await agent
+            const response = await request(application)
                 .post('/api/signin')
                 .set('content-type', 'application/json')
                 .send({
@@ -197,7 +192,7 @@ describe('authenticate', () => {
                 'testuser@muzzarelli.dev'
             );
 
-            token = extractCookie(agent, 'token');
+            // token = extractCookie(agent, 'token');
 
             response = await agent
                 .post('/api/pulse')
@@ -247,7 +242,7 @@ describe('authenticate', () => {
                 'testuser@muzzarelli.dev'
             );
 
-            token = extractCookie(agent, 'token');
+            // token = extractCookie(agent, 'token');
 
             response = await agent
                 .post('/api/signout')
@@ -269,15 +264,6 @@ describe('authenticate', () => {
         });
     });
 });
-
-function extractCookie(agent: TestAgent, name: string): string {
-    const value: string =
-        agent.jar.getCookie(name, CookieAccessInfo.All)?.value ?? '';
-
-    expect(value).not.toBe('');
-
-    return value;
-}
 
 async function deleteTestUser() {
     await FirestoreService.deleteOne(
