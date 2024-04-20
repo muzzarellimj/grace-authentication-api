@@ -1,5 +1,4 @@
-import { Request } from 'express';
-import passport, { VerifiedCallback } from 'passport-jwt';
+import passport, { ExtractJwt, VerifiedCallback } from 'passport-jwt';
 import { FirestorePath, FirestoreService } from '../services/firestore.service';
 import { LoggingService } from '../services/logging.service';
 
@@ -9,7 +8,7 @@ const JwtStrategy = passport.Strategy;
 
 const options = {
     secretOrKey: process.env.JWT_SECRET as string,
-    jwtFromRequest: cookieExtractor,
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 };
 
 type JwtPayload = {
@@ -71,9 +70,5 @@ const jwtStrategy = new JwtStrategy(
         return done(null, user);
     }
 );
-
-function cookieExtractor(request: Request) {
-    return request?.cookies?.token;
-}
 
 export default jwtStrategy;
