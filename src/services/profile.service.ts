@@ -11,6 +11,7 @@ export class ProfileService {
 
         const profile: Profile = {
             id: user.id,
+            externalId: user.externalId,
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,

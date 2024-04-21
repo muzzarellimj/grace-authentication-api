@@ -10,6 +10,7 @@ export type User = {
 
 export type Profile = {
     id: string;
+    externalId?: string;
     email?: string;
     firstName: string;
     lastName: string;
