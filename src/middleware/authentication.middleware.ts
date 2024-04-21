@@ -24,7 +24,7 @@ export async function preventAuthentication(
 
     const token: string = extractToken(request);
 
-    if (token) {
+    if (token.length != 0) {
         const tokenExpired: boolean = isTokenExpired(token);
 
         response = await AuthenticationStateService.clearAuthenticationState(

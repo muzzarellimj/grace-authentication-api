@@ -20,7 +20,18 @@ export function extractToken(request: Request): string {
         return '';
     }
 
-    const token: string = header.replace('Bearer ', '').trim();
+    const token: string = header.replace('Bearer', '').trim();
+
+    if (token.length == 0) {
+        LoggingService.debug({
+            cls: cls,
+            fn: fn,
+            message:
+                'JWT could not be extracted; authorization header was present with an empty token value.',
+        });
+
+        return '';
+    }
 
     LoggingService.debug({
         cls: cls,
