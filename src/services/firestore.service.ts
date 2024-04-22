@@ -8,6 +8,7 @@ import {
     getFirestore,
     query,
     setDoc,
+    updateDoc,
     where,
 } from 'firebase/firestore';
 
@@ -43,6 +44,30 @@ export class FirestoreService {
         document.createdAt = Date.now();
 
         await setDoc(documentReference, document);
+    }
+
+    static async updateOne(
+        path: FirestorePath,
+        key: string,
+        operator: WhereFilterOp,
+        value: any,
+        data: any
+    ): Promise<boolean> {
+        const queryStatement = query(
+            collection(getFirestore(), path),
+            where(key, operator, value)
+        );
+        const snapshot = await getDocs(queryStatement);
+
+        if (snapshot.empty) {
+            return false;
+        }
+
+        const documentReference = snapshot.docs[0].ref;
+
+        await updateDoc(documentReference, data);
+
+        return true;
     }
 
     static async deleteOne(
