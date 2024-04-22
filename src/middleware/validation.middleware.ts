@@ -20,6 +20,29 @@ const userCreationArgsSchema: ZodSchema = z.object({
     }),
 });
 
+const userUpdateArgsSchema: ZodSchema = z.object({
+    email: z
+        .string()
+        .email({ message: 'Please enter a valid email address.' })
+        .optional(),
+    password: z
+        .string()
+        .min(MIN_PASSWORD_LENGTH, {
+            message: 'Please enter a password with 8 or more characters.',
+        })
+        .optional(),
+    firstName: z
+        .string({
+            required_error: 'Please provide an appropriate first name.',
+        })
+        .optional(),
+    lastName: z
+        .string({
+            required_error: 'Please provide an appropriate last name.',
+        })
+        .optional(),
+});
+
 export function validateUserCreationArgs(
     request: Request,
     response: Response,
@@ -66,6 +89,57 @@ export function validateUserCreationArgs(
         fn: fn,
         message:
             'User creation argument validation success; proceeding to next function',
+    });
+
+    next();
+}
+
+export function validateUserUpdateArgs(
+    request: Request,
+    response: Response,
+    next: NextFunction
+) {
+    const fn: string = 'validateUserUpdateArgs';
+
+    LoggingService.debug({
+        cls: cls,
+        fn: fn,
+        message: 'Validating user update arguments...',
+    });
+
+    const validationState = userUpdateArgsSchema.safeParse({
+        email: request.body.email,
+        password: request.body.password,
+        firstName: request.body.firstName,
+        lastName: request.body.lastName,
+    });
+
+    if (!validationState.success) {
+        LoggingService.debug({
+            cls: cls,
+            fn: fn,
+            message: 'User update argument validation failure.',
+            data: {
+                email: request.body.email,
+                firstName: request.body.firstName,
+                lastName: request.body.lastName,
+            },
+        });
+
+        const message: string =
+            validationState.error.issues[0]?.message ??
+            'Oops! We hit a snag. Please try again later.';
+
+        return response
+            .status(StatusCodes.BAD_REQUEST)
+            .json({ status: StatusCodes.BAD_REQUEST, message: message });
+    }
+
+    LoggingService.debug({
+        cls: cls,
+        fn: fn,
+        message:
+            'User update argument validation success; proceeding to next function',
     });
 
     next();

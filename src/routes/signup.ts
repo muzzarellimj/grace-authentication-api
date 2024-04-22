@@ -3,7 +3,7 @@ import express, { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { DEFAULT_SALT_ROUND_COUNT } from '../constants';
 import { preventAuthentication } from '../middleware/authentication.middleware';
-import { validateUserCreationArgs } from '../middleware/validation';
+import { validateUserCreationArgs } from '../middleware/validation.middleware';
 import { FirestorePath, FirestoreService } from '../services/firestore.service';
 import { LoggingService } from '../services/logging.service';
 
