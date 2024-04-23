@@ -92,7 +92,6 @@ router.post(
 
         response.status(StatusCodes.CREATED).json({
             status: StatusCodes.CREATED,
-            message: 'Your user profile has been created. Welcome to Grace!',
         });
     }
 );
