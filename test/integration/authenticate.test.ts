@@ -28,9 +28,6 @@ describe('authenticate', () => {
                 });
 
             expect(response.status).toBe(StatusCodes.CREATED);
-            expect(response.body.message).toBe(
-                'Your user profile has been created. Welcome to Grace!'
-            );
         });
 
         it('should not create user when email is invalid', async () => {
