@@ -7,7 +7,7 @@ import { initializeApp } from 'firebase/app';
 import passport from 'passport';
 import pulseRouter from './routes/pulse.route';
 import signinRouter from './routes/signin.route';
-import signoutRouter from './routes/signout';
+import signoutRouter from './routes/signout.route';
 import signupRouter from './routes/signup.route';
 import updateRouter from './routes/update.route';
 import { LoggingService } from './services/logging.service';
