@@ -9,6 +9,7 @@ import pulseRouter from './routes/pulse';
 import signinRouter from './routes/signin';
 import signoutRouter from './routes/signout';
 import signupRouter from './routes/signup';
+import updateRouter from './routes/update.route';
 import { LoggingService } from './services/logging.service';
 import emailPasswordStrategy from './strategies/email-password';
 import googleOAuthStrategy from './strategies/google-oauth';
@@ -30,6 +31,7 @@ app.use('/api', pulseRouter);
 app.use('/api', signupRouter);
 app.use('/api', signinRouter);
 app.use('/api', signoutRouter);
+app.use('/api', updateRouter);
 
 initializeApp({
     apiKey: process.env.FIREBASE_API_KEY,
