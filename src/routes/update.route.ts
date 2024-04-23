@@ -90,7 +90,6 @@ router.post(
 
         response.status(StatusCodes.OK).json({
             status: StatusCodes.OK,
-            message: 'Your user profile has been updated.',
         });
     }
 );
