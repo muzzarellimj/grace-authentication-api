@@ -8,7 +8,7 @@ import passport from 'passport';
 import pulseRouter from './routes/pulse';
 import signinRouter from './routes/signin';
 import signoutRouter from './routes/signout';
-import signupRouter from './routes/signup';
+import signupRouter from './routes/signup.route';
 import updateRouter from './routes/update.route';
 import { LoggingService } from './services/logging.service';
 import emailPasswordStrategy from './strategies/email-password';

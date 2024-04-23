@@ -1,11 +1,10 @@
-import bcrypt from 'bcrypt';
 import express, { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { DEFAULT_SALT_ROUND_COUNT } from '../constants';
 import { preventAuthentication } from '../middleware/authentication.middleware';
 import { validateUserCreationArgs } from '../middleware/validation.middleware';
 import { FirestorePath, FirestoreService } from '../services/firestore.service';
 import { LoggingService } from '../services/logging.service';
+import { encrypt } from '../utils/password.util';
 
 const cls: string = 'signup';
 
@@ -55,38 +54,31 @@ router.post(
             });
         }
 
-        bcrypt.hash(
-            password,
-            DEFAULT_SALT_ROUND_COUNT,
-            async (error: Error | undefined, hash: string) => {
-                if (error) {
-                    LoggingService.error({
-                        cls: cls,
-                        fn: fn,
-                        message:
-                            'Email and password sign-up failure; error encounted while salting and hashing password.',
-                        data: {
-                            email: email,
-                        },
-                    });
+        const hash: string | undefined = encrypt(password);
 
-                    return response
-                        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-                        .json({
-                            status: StatusCodes.INTERNAL_SERVER_ERROR,
-                            message:
-                                'Oops! We hit a snag. Please try again later.',
-                        });
-                }
+        if (!hash || hash.length == 0) {
+            LoggingService.error({
+                cls: cls,
+                fn: fn,
+                message:
+                    'Email and password sign-up failure; error encounted while salting and hashing password.',
+                data: {
+                    email: email,
+                },
+            });
 
-                await FirestoreService.storeOne(FirestorePath.USER, {
-                    email: email.toLowerCase(),
-                    password: hash,
-                    firstName: firstName,
-                    lastName: lastName,
-                });
-            }
-        );
+            return response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                status: StatusCodes.INTERNAL_SERVER_ERROR,
+                message: 'Oops! We hit a snag. Please try again later.',
+            });
+        }
+
+        await FirestoreService.storeOne(FirestorePath.USER, {
+            email: email.toLowerCase(),
+            password: hash,
+            firstName: firstName,
+            lastName: lastName,
+        });
 
         LoggingService.info({
             cls: cls,
