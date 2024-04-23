@@ -44,6 +44,7 @@ export async function preventAuthentication(
             });
 
             return response.status(StatusCodes.FORBIDDEN).json({
+                status: StatusCodes.FORBIDDEN,
                 message: 'Oops! We hit a snag. Please try again later.',
             });
         }
