@@ -1,5 +1,5 @@
 import { createRequest, createResponse } from 'node-mocks-http';
-import { validateUserCreationArgs } from '../../../src/middleware/validation';
+import { validateUserCreationArgs } from '../../../src/middleware/validation.middleware';
 import { LoggingService } from '../../../src/services/logging.service';
 
 const email: string = 'testuser@muzzarelli.dev';
