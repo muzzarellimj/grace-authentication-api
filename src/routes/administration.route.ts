@@ -1,8 +1,9 @@
 import express, { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import passport from 'passport';
+import { isAdministrator } from '../middleware/authorization.middleware';
 import { validateUserUpdateArgs } from '../middleware/validation.middleware';
-import { Role, Status, User } from '../models/user';
+import { User } from '../models/user';
 import { FirestorePath, FirestoreService } from '../services/firestore.service';
 import { LoggingService } from '../services/logging.service';
 import {
@@ -21,14 +22,9 @@ router.post(
     '/administration/update',
     validateUserUpdateArgs,
     passport.authenticate('jwt', { session: false }),
+    isAdministrator,
     async (request: Request, response: Response) => {
         const fn: string = '/api/administration';
-
-        LoggingService.debug({
-            cls: cls,
-            fn: fn,
-            message: 'Authentication success; checking authorization...',
-        });
 
         const administrator: User | undefined = request.user as User;
 
@@ -43,30 +39,6 @@ router.post(
             return response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
                 status: StatusCodes.INTERNAL_SERVER_ERROR,
                 message: 'Oops! We hit a snag. Please try again.',
-            });
-        }
-
-        if (
-            administrator.role != Role.ADMINISTRATOR ||
-            administrator.status != Status.ACTIVE
-        ) {
-            LoggingService.error({
-                cls: cls,
-                fn: fn,
-                message:
-                    'Unable to update user; administrator is either unauthorized or restricted.',
-                data: {
-                    id: administrator.id,
-                    email: administrator.email,
-                    role: administrator.role,
-                    status: administrator.status,
-                },
-            });
-
-            return response.status(StatusCodes.FORBIDDEN).json({
-                status: StatusCodes.FORBIDDEN,
-                message:
-                    "Oops! You don't have access to this resource. Contact an administrator if this seems incorrect.",
             });
         }
 
