@@ -5,7 +5,11 @@ import { validateUserUpdateArgs } from '../middleware/validation.middleware';
 import { User } from '../models/user';
 import { FirestorePath, FirestoreService } from '../services/firestore.service';
 import { LoggingService } from '../services/logging.service';
-import { encrypt } from '../utils/password.util';
+import {
+    processEmailArg,
+    processNameArg,
+    processPasswordArg,
+} from '../utils/argument.util';
 
 const cls: string = 'update.route';
 
@@ -93,102 +97,5 @@ router.post(
         });
     }
 );
-
-function processPasswordArg(request: Request, data: any): any {
-    const fn: string = 'processPasswordArg';
-
-    const passwordArg: string | undefined = request.body.password;
-
-    if (!passwordArg || passwordArg.length == 0) {
-        LoggingService.debug({
-            cls: cls,
-            fn: fn,
-            message:
-                'Password argument is empty; data object has not been manipulated.',
-        });
-
-        return data;
-    }
-
-    const hash: string | undefined = encrypt(passwordArg);
-
-    if (!hash || hash.length == 0) {
-        LoggingService.debug({
-            cls: cls,
-            fn: fn,
-            message:
-                'Generated password hash is empty; data object has not been manipulated.',
-        });
-
-        return data;
-    }
-
-    LoggingService.debug({
-        cls: cls,
-        fn: fn,
-        message:
-            'Password hash generated; data object has been manipulated to include password.',
-    });
-
-    data.password = hash;
-
-    return data;
-}
-
-function processEmailArg(request: Request, data: any): any {
-    const fn: string = 'processEmailArg';
-
-    const emailArg: string | undefined = request.body.email;
-
-    if (!emailArg || emailArg.length == 0) {
-        LoggingService.debug({
-            cls: cls,
-            fn: fn,
-            message:
-                'Email argument is empty; data object has not been manipulated.',
-        });
-
-        return data;
-    }
-
-    LoggingService.debug({
-        cls: cls,
-        fn: fn,
-        message:
-            'Email is valid; data object has been manipulated to include email.',
-    });
-
-    data.email = emailArg.toLowerCase();
-
-    return data;
-}
-
-function processNameArg(argument: string, request: Request, data: any) {
-    const fn: string = 'processNameArg';
-
-    const nameArg: string | undefined = request.body[argument];
-
-    if (!nameArg || nameArg.length == 0) {
-        LoggingService.debug({
-            cls: cls,
-            fn: fn,
-            message:
-                'Name argument is empty; data object has not been manipulated.',
-        });
-
-        return data;
-    }
-
-    LoggingService.debug({
-        cls: cls,
-        fn: fn,
-        message:
-            'Name argument is valid; data object has been manipulated to include name.',
-    });
-
-    data[argument] = nameArg;
-
-    return data;
-}
 
 export default router;
