@@ -5,6 +5,7 @@ import cors from 'cors';
 import express, { Express } from 'express';
 import { initializeApp } from 'firebase/app';
 import passport from 'passport';
+import administrationRouter from './routes/administration.route';
 import pulseRouter from './routes/pulse.route';
 import signinRouter from './routes/signin.route';
 import signoutRouter from './routes/signout.route';
@@ -27,6 +28,7 @@ passport.use('email-password', emailPasswordStrategy);
 passport.use('jwt', jwtStrategy);
 passport.use('google-oauth', googleOAuthStrategy);
 
+app.use('/api', administrationRouter);
 app.use('/api', pulseRouter);
 app.use('/api', signupRouter);
 app.use('/api', signinRouter);
