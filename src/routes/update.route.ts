@@ -24,7 +24,7 @@ router.post(
             message: 'Authentication success; updating profile...',
         });
 
-        const user: User | undefined = request.user;
+        const user: User | undefined = request.user as User;
 
         if (!user || !user.email) {
             LoggingService.error({
@@ -58,12 +58,12 @@ router.post(
                 });
             }
 
-            const emailExists: User | null = await FirestoreService.findOne(
+            const emailExists: User | null = (await FirestoreService.findOne(
                 FirestorePath.USER,
                 'email',
                 '==',
                 data.email
-            );
+            )) as User;
 
             if (emailExists && emailExists.email == data.email) {
                 return response.status(StatusCodes.BAD_REQUEST).json({

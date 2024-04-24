@@ -1,4 +1,5 @@
 import { createResponse } from 'node-mocks-http';
+import { Role, Status } from '../../../src/models/user';
 import AuthenticationStateService from '../../../src/services/authentication-state.service';
 import { FirestoreService } from '../../../src/services/firestore.service';
 import { LoggingService } from '../../../src/services/logging.service';
@@ -49,6 +50,8 @@ describe('AuthenticationStateService', () => {
             await AuthenticationStateService.storeAuthenticationState(
                 {
                     id: id,
+                    role: Role.USER,
+                    status: Status.ACTIVE,
                 },
                 token,
                 response

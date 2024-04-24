@@ -2,6 +2,7 @@ import express, { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { preventAuthentication } from '../middleware/authentication.middleware';
 import { validateUserCreationArgs } from '../middleware/validation.middleware';
+import { Role, Status } from '../models/user';
 import { FirestorePath, FirestoreService } from '../services/firestore.service';
 import { LoggingService } from '../services/logging.service';
 import { encrypt } from '../utils/password.util';
@@ -78,6 +79,8 @@ router.post(
             password: hash,
             firstName: firstName,
             lastName: lastName,
+            role: Role.USER,
+            status: Status.ACTIVE,
         });
 
         LoggingService.info({

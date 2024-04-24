@@ -74,7 +74,7 @@ export async function handleAuthentication(
             'Passport authentication success; handling local server-side authentication...',
     });
 
-    const user: User | undefined = request.user;
+    const user: User | undefined = request.user as User;
 
     if (!user || !user.id) {
         LoggingService.error({
@@ -144,7 +144,7 @@ export async function handleDeauthentication(
             'Passport authentication success; handling local server-side deauthentication...',
     });
 
-    const user: User | undefined = request.user;
+    const user: User | undefined = request.user as User;
 
     if (!user || !user.id) {
         LoggingService.error({

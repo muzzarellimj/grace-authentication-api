@@ -3,6 +3,7 @@ import passport, {
     StrategyOptions,
     VerifyCallback,
 } from 'passport-google-oauth20';
+import { Role, Status } from '../models/user';
 import { FirestorePath, FirestoreService } from '../services/firestore.service';
 import { LoggingService } from '../services/logging.service';
 
@@ -50,6 +51,8 @@ const googleOAuthStrategy = new GoogleOAuthStrategy(
                 email: profile.emails?.[0].value,
                 firstName: profile.name?.givenName,
                 lastName: profile.name?.familyName,
+                role: Role.USER,
+                status: Status.ACTIVE,
             });
 
             const newUser = await FirestoreService.findOne(

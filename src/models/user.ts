@@ -6,6 +6,8 @@ export type User = {
     firstName?: string;
     lastName?: string;
     createdAt?: number;
+    role: Role;
+    status: Status;
 };
 
 export type Profile = {
@@ -14,4 +16,16 @@ export type Profile = {
     email?: string;
     firstName: string;
     lastName: string;
+    role: Role;
+    status: Status;
 };
+
+export enum Role {
+    USER,
+    ADMINISTRATOR,
+}
+
+export enum Status {
+    ACTIVE,
+    RESTRICTED,
+}
