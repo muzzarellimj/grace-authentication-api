@@ -37,6 +37,23 @@ export class FirestoreService {
         return snapshot.docs[0].data();
     }
 
+    static async findAll(path: FirestorePath): Promise<DocumentData[] | null> {
+        const queryStatement = query(collection(getFirestore(), path));
+        const snapshot = await getDocs(queryStatement);
+
+        if (snapshot.empty) {
+            return null;
+        }
+
+        const documents: DocumentData[] = [];
+
+        snapshot.docs.forEach((documentSnapshot) => {
+            documents.push(documentSnapshot.data());
+        });
+
+        return documents;
+    }
+
     static async storeOne(path: FirestorePath, document: any): Promise<void> {
         const documentReference = doc(collection(getFirestore(), path));
 

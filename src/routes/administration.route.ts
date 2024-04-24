@@ -1,4 +1,5 @@
 import express, { Request, Response, Router } from 'express';
+import { DocumentData } from 'firebase/firestore';
 import { StatusCodes } from 'http-status-codes';
 import passport from 'passport';
 import { isAdministrator } from '../middleware/authorization.middleware';
@@ -17,6 +18,70 @@ import {
 const cls: string = 'administration.route';
 
 const router: Router = express();
+
+router.get(
+    '/administration/user',
+    passport.authenticate('jwt', { session: false }),
+    isAdministrator,
+    async (request: Request, response: Response) => {
+        const fn: string = '/api/administration/user';
+
+        const administrator: User | undefined = request.user as User;
+
+        if (!administrator || !administrator.email) {
+            LoggingService.error({
+                cls: cls,
+                fn: fn,
+                message:
+                    'Unable to retrieve user set; administrator credentials could not be parsed in request.',
+            });
+
+            return response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                status: StatusCodes.INTERNAL_SERVER_ERROR,
+                message: 'Oops! We hit a snag. Please try again.',
+            });
+        }
+
+        LoggingService.debug({
+            cls: cls,
+            fn: fn,
+            message: 'Retrieving all available user records...',
+        });
+
+        const documents: DocumentData[] | null = await FirestoreService.findAll(
+            FirestorePath.USER
+        );
+
+        if (!documents || documents.length == 0) {
+            LoggingService.warn({
+                cls: cls,
+                fn: fn,
+                message:
+                    'Unable to retrieve user set; document set was either null or empty',
+            });
+
+            return response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                status: StatusCodes.INTERNAL_SERVER_ERROR,
+                message: 'Oops! We hit a snag. Please try again.',
+            });
+        }
+
+        documents.map((document: DocumentData) => {
+            delete document.password;
+        });
+
+        LoggingService.debug({
+            cls: cls,
+            fn: fn,
+            message: 'Retrieved all available user records with success.',
+        });
+
+        return response.status(StatusCodes.OK).json({
+            status: StatusCodes.OK,
+            data: documents,
+        });
+    }
+);
 
 router.post(
     '/administration/update',
