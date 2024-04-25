@@ -107,7 +107,7 @@ export function processRoleArg(request: Request, data: any): any {
 
     const roleArg: number | undefined = request.body.role;
 
-    if (!roleArg) {
+    if (roleArg == undefined) {
         LoggingService.debug({
             cls: cls,
             fn: fn,
@@ -149,7 +149,7 @@ export function processStatusArg(request: Request, data: any): any {
 
     const statusArg: number | undefined = request.body.status;
 
-    if (!statusArg) {
+    if (statusArg == undefined) {
         LoggingService.debug({
             cls: cls,
             fn: fn,
